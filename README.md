@@ -202,17 +202,59 @@ We have two very simple services here. In fact, they're so simple, they do very 
 ![Architecture Overview](/images/first_two_flows.png)
 
 
-There are two types of boxes that will help you debug your code throughout this lab; the Inject box and the Debug box. Clicking the square on the left side of a light-blue Inject box sends a specific piece of data into a flow. This can be used to emulate a web call or device input, and can only be used as input sources. The dark green node, called the Debug node, grabs the values of a particular object and displays it on the Debug panel on the right side of your screen. Debug nodes can be temporarily deactivated by clicking on the green square on the right side. 
+There are two types of boxes that will help you debug your code throughout this lab; 
+the Inject box and the Debug box. Clicking the square on the left side of a light-blue 
+Inject box sends a specific piece of data into a flow. This can be used to emulate a web 
+call or device input, and can only be used as input sources. The dark green node, called 
+the Debug node, grabs the values of a particular object and displays it on the Debug panel 
+on the right side of your screen. Debug nodes can be temporarily deactivated by clicking on 
+the green square on the right side.   
+
 ![Architecture Overview](/images/inject_debug.png)
 
+You can try this yourself by dragging each of the nodes into the flow.
+
+Double click on the **Inject** node and replace the values as follows:
+![Architecture Overview](/images/inject-hello.png)
+
+Double click on the debug node and change the name:
+![Architecture Overview](/images/debug-hello.png)
+
+- Now click on the **Deploy** button at the top of the screen.
+		You can now click on the left side of the "Hello World" and you should see the output in the debug panel
+		![Architecture Overview](/images/hello-debug-panel.png)		
+
+The first line is a service, and should already work. You can test it and view the debug output using those Inject and Debug nodes.   
+- Click on the inject button for the "Test Item Lookup" 
+
+![Architecture Overview](/images/inject-test-item-lookup-node.png)
+
+Your output in the debug panel should look like:
+
+![Architecture Overview](/images/test-item-lookup-debug.png)
 
 
-The first line is a service, and should already work. You can test it and view the debug output using those Inject and Debug nodes. The flow accepts a GET request, and uses the information in the GET querystring to perform its own GET request to the inventory key/value store, which is running out of CICS. It then simply takes the response and sends it back out to the original requestor. By opening the node for the HTTP call, you can see how the item name is substituted in the url by use of triple curly braces. {{{like.this}}} 
+The flow accepts a GET request, and uses the information in the GET querystring to perform its own GET request to the inventory key/value store, which is running out of CICS. It then simply takes the response and sends it back out to the original requestor. By opening the node for the HTTP call, you can see how the item name is substituted in the url by use of triple curly braces. {{{like.this}}} 
 
 ![Architecture Overview](/images/http_request.png)
 
 
-Below it, you'll find another string of nodes, but this series of nodes doesn't work, and we need to fix it. The HTTP IN and OUT are correct, but this service performs a slightly different query.
+
+
+- Do the same thing for the "Test Store Lookup"
+
+What you see is probably not what you expect.
+![Architecture Overview](/images/store-lookup-debug.png)
+As you can see in the debug panel there is an error "No url specified". This is because the "HTTP Node" is not configured properly.
+
+- Double click on the **Store Lookup"** node
+![Architecture Overview](/images/http-store-lookup-node.png)
+
+This intentionally doesn't work so we need to fix it. The "URL" field was left empty.
+![Architecture Overview](/images/http-store-lookup-node-edit.png)
+
+
+The HTTP IN and OUT are correct, but this service performs a slightly different query.
 
 The company uses this service to check on the status of a particular item in a specific store, and they use the following format:
 
@@ -220,15 +262,19 @@ http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]
 
 So, for example, if we wanted to look up the status of an item in the Poughkeepsie, NY store location, we would use the following key:
 
-http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/poughkeepsieny_8675309
 
-Your HTTP ReST call should look fairly similar to the first one, except that you'll be using the triple-curly-braces to substitute two parameters instead of one. Remember the formatting above.
+`http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload.storeprefix}}}_{{{payload.itemnumber}}}`
+
+![Architecture Overview](/images/http-store-lookup-node-edit-url.png)
+
+
+Your HTTP REST call should look fairly similar to the first one, except that you'll be using the triple-curly-braces to substitute two parameters instead of one. Remember the formatting above.
 
 When done, you should have two services, and both Test buttons should return something looking like item information from the CICS Replies debug node.
 
 Tip: Don't worry if you see a "No Response Object" warning while testing with the buttons. Since we're calling it from a manual inject, and not an HTTP request, the HTTP response node gets confused, but it'll work just fine when we call it as a real service. 
 
-You can also drive these services from a ReST client, by using the addresses noted in the HTTP In nodes.
+You can also drive these services from a REST client, by using the addresses noted in the HTTP In nodes.
 
 
  
@@ -408,9 +454,36 @@ Copy and paste the code for Exercise #2 below your existing services and take a 
     }
 ]
 ```
-Following the flow from the beginning, we've got an HTTP In, so this can be called as an API. There are also two Test Inject buttons which you can use to easily debug your code. From there, we're just going to save "sample_store" as our store prefix, since that's already populated for us with data. 
+Following the flow from the beginning, we've got an HTTP In (Translate Name/Number), so this can be called as an API. 
+There are also two Test Inject buttons (generator) and (19645922) which you can use to easily debug your code.
+If you double click on the "Set store prefix" 
+![Architecture Overview](/images/set-store-prefix-node.png)
 
-The "IsNumerical" node uses Regex to figure out if the incoming payload is text or numerical. If it's text (an item name), then we'll use the same logic we did above to get the ItemId.
+You will see that the we set the "msg.store_prefix" attribute of the JSON object to "sample_store"
+![Architecture Overview](/images/set-store-prefix-node-details.png)
+
+We are using  "sample_store" as our store prefix, because data is already populated on zOS for this store prefix. 
+
+The "IsNumerical" node uses Regex to figure out if the incoming payload is text or numerical. 
+If it's text (an item name), then we'll need to use the same logic we did above to get the ItemId.
+
+The "isNumerical" node is a **switch** node which allows for the flow to change based on the conditions defined in the switch node details.
+![Architecture Overview](/images/isnumerical-node.png)
+
+As you can see in the image below where are two conditions in he "switch node".
+![Architecture Overview](/images/isnumerical-node-details.png)
+
+The first condition evaluated is that a number value between 0 and 9999999 is stored in msg.payload.
+The second condition is the catch all condition, which in our case says, that if the values in msg.payload are not a number we wil pass it here.
+
+Now look at the isNumerical node again, you will see two small gray circles on the right of the node.
+![Architecture Overview](/images/isnumerical-node.png)
+Those two circles correspond to the two condition in the node details. The top circle is used for the number matching and the bottom circle is for the catch all.
+
+Remember from the prior exercise we updated the store lookup node to accept a store prefix as well as a product number. So that is a logical place to connect our "isNumberical" output to.
+![Architecture Overview](/images/isnumerical-node-to-store-lookup-node.png)
+
+
 
 If it's numerical, then we'll do a similar call, making sure to pass along the item number and store prefix, which we saved in the earlier function. You’ll be using some of the functionality used in Exercise 1 to complete this, and when working correctly, you may end up with something that looks like this.  
 
