@@ -454,8 +454,14 @@ Copy and paste the code for Exercise #2 below your existing services and take a 
     }
 ]
 ```
+
+![Architecture Overview](/images/exercise-two-initial-view.png)
+
+
 Following the flow from the beginning, we've got an HTTP In (Translate Name/Number), so this can be called as an API. 
 There are also two Test Inject buttons (generator) and (19645922) which you can use to easily debug your code.
+The basic princple of this API is to allow the user to send an "itemID" and get a "product name" in response or
+
 If you double click on the "Set store prefix" 
 ![Architecture Overview](/images/set-store-prefix-node.png)
 
@@ -480,18 +486,150 @@ Now look at the isNumerical node again, you will see two small gray circles on t
 ![Architecture Overview](/images/isnumerical-node.png)
 Those two circles correspond to the two condition in the node details. The top circle is used for the number matching and the bottom circle is for the catch all.
 
-Remember from the prior exercise we updated the store lookup node to accept a store prefix as well as a product number. So that is a logical place to connect our "isNumberical" output to.
-![Architecture Overview](/images/isnumerical-node-to-store-lookup-node.png)
+Remember from the prior exercise we showed an API that looked like the following:
+`http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]`
+
+Because the "isNumerical" is passing a number and the "set store_prefix" is setting the store name we have both pieces of information we need for the API.
+
+The JSON object that gets created from the "set store_prefix" and from the "inject" nodes is the following:
+
+```JSON
+{
+"store_prefix":"sample_store",
+"payload":"19645922"
+}
+``` 
+
+So now we want to create the URL by using the "Mustache" syntax.
+`http://[hostname]]/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}`
+
+This will take the "store_prefix" JSON value and the "payload" JSON value and add it to the end of the URL. We now need to add the http request to invoke the URL.
+
+Drag the **http request** node from the pallet to the flow editor.
+
+![Architecture Overview](/images/http-request-node.png)
+
+ Now **double click** the node. 
+
+![Architecture Overview](/images/http-request-editor-node.png)
 
 
+Change the name of the node to "item lookup".
 
-If it's numerical, then we'll do a similar call, making sure to pass along the item number and store prefix, which we saved in the earlier function. You’ll be using some of the functionality used in Exercise 1 to complete this, and when working correctly, you may end up with something that looks like this.  
+![Architecture Overview](/images/item-lookup-node.png)
 
-![Architecture Overview](/images/semi_complete_translate.png)
+Also paste the following url into the URL field.
+`http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}` 
+![Architecture Overview](/images/item-lookup-detail.png)
+
+Make sure to change the "Return" value from "a UTF-8 string" to "a parsed JSON object"
+
+Close the detail view of the "item Lookup" node. Create a connection between the "Item lookup" and "Translate Debug" nodes. This will allow us to see what is returned from invoking the API.
+![Architecture Overview](/images/connect-itemid-debug-nodes.png)
+
+Click the **Deploy** button at the top of the screen.
+
+![Architecture Overview](/images/deploy-button.png)
+
+This will push your updates to the server on BlueMix.
 
 
+Next, click on the left side of the **Inject** node that has "19645922". This causes the inject to be fired and the flow to be executed.
 
-The completed new service will make it easy for a developer to translate back and forth between item names and numbers.
+![Architecture Overview](/images/inject-itemid-node.png)
+
+You should see something like the following in the debug window on the right side:
+![Architecture Overview](/images/item-lookup-debug-output.png)
+
+Okay, as you can see there is a JSON result coming from the API call.
+```JSON
+{
+	"inventory":24,
+	"price":"49.98",
+	"name":"Rainjacket",
+	"min_stock":35,
+	"location_code":"466.014.812"
+}
+```
+
+Remember our newly create REST API is supposed to only return the "Name" of a product when supplied with a "ItemID". So we need to clean up the JSON response to only return the "Name" value. To do this we need to drag the "Function" node from the pallet to the editor.
+
+![Architecture Overview](/images/function-node-pallet.png)
+
+Next delete the link between the "Item Lookup" node and the "Tranlate Debug" node. Create a new connection between the "Item Lookup" and the newly dropped "Function" node. Change the name of the "Function" node to "Parse out Name". This is done by double clicking on the "Function" node and changing the name. Your function node editor view should look like:
+
+![Architecture Overview](/images/parse-out-name-node.png)
+
+Make sure to paste the following code into the function editor
+
+```Javascript
+	msg.payload = msg.payload.name;
+	return msg;
+```
+
+Click **Done** when finished. 
+
+
+The above code is taking the results "msg.payload.name" from the JSON that was returned from the API call and reassigning the "msg.payload" with the name value. This is because our newly created REST API is only supposed to return a name, if the itemID is supplied.
+
+Now connect the "Parse out Name" function to the "Translate Debug" node and to the "Return Translated Name/Number" http response node.
+
+![Architecture Overview](/images/parse-out-name-flow.png)
+
+Click the **Deploy** button at the top of the screen.
+
+![Architecture Overview](/images/deploy-button.png)
+
+This will push your updates to the server on BlueMix.
+
+Next, click on the left side of the **Inject** node that has "19645922". This causes the inject to be fired and the flow to be executed.
+
+![Architecture Overview](/images/inject-itemid-node.png)
+
+You should see something like the following in the debug window on the right side:
+
+![Architecture Overview](/images/parse-out-name-debug.png)
+
+As you can see the response is just the name now, not the rest of the JSON object.
+Don't worry about the "No response object" message shows.
+
+
+Next we are going to do the same thing as we just did, but now for translating a "product name" into a "itemID".
+
+
+Drag the **http request** node from the pallet to the flow editor.
+
+![Architecture Overview](/images/http-request-node.png)
+
+ Now **double click** the node. 
+
+![Architecture Overview](/images/http-request-editor-node.png)
+
+
+Change the name of the node to "name lookup" and add the following URL:
+``http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload}}}``
+
+Notice in this URL the only attribute we are looking for is the "payload". The store number isn't needed. Aslo, make sure to change the "Return" value from "a UTF-8 string" to "a parsed JSON object".
+
+Click **Done** when finished.
+
+Now connect the "name lookup" to the "Parse out Itemid". You are just about done. Click the **Deploy** button at the top of the screen.
+
+![Architecture Overview](/images/deploy-button.png)
+
+Now click on the **generator** inject node.
+
+![Architecture Overview](/images/inject-generator-node.png)
+
+You should now see something like the following in the debug panel on the right side of the page:
+
+![Architecture Overview](/images/generator-flow-debug.png)
+
+Okay your final flow should look something like the following:
+
+![Architecture Overview](/images/exercise-two-full-flow.png)
+
+Congrats you have completed exercise 2. The completed new service will make it easy for a developer to translate back and forth between item names and numbers.
 
 ## Exercise 3:
 Start a new tab in Node-RED, and paste in the nodes for Exercise 3. 
