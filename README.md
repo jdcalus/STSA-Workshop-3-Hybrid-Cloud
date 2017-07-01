@@ -458,11 +458,19 @@ Copy and paste the code for Exercise #2 below your existing services and take a 
 ![Architecture Overview](/images/exercise-two-initial-view.png)
 
 
-Following the flow from the beginning, we've got an HTTP In (Translate Name/Number), so this can be called as an API. 
-There are also two Test Inject buttons (generator) and (19645922) which you can use to easily debug your code.
-The basic princple of this API is to allow the user to send an "itemID" and get a "product name" in response or
+Following the flow from left to right. We have an "HTTP In" (Translate Name/Number) node, which we can view as an API endpoint for others to call. 
+There are also two Test Inject buttons "(generator)" and "(19645922)" which you can use to easily debug your code. These simulate the API being called.
+The basic principle of this API is to allow the user to send an "itemID" and get a "product name" in response. or sent a "product name" and get an "ItemID" in response.
 
-If you double click on the "Set store prefix" 
+Remember we have to ultimately call an API on zOS that looks like:
+
+```
+http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]
+or
+http://[hostname]]/resources/ecs/IBM/demo/[item_name]
+```
+
+Next, if you double click on the "Set store prefix" 
 ![Architecture Overview](/images/set-store-prefix-node.png)
 
 You will see that the we set the "msg.store_prefix" attribute of the JSON object to "sample_store"
@@ -470,9 +478,20 @@ You will see that the we set the "msg.store_prefix" attribute of the JSON object
 
 We are using  "sample_store" as our store prefix, because data is already populated on zOS for this store prefix. 
 
-The "IsNumerical" node uses Regex to figure out if the incoming payload is text or numerical. 
-If it's text (an item name), then we'll need to use the same logic we did above to get the ItemId.
+Next is the "IsNumerical" node. It uses Regex to figure out if the incoming payload is text or numerical. 
+If it's text (an item name), we will want to make sure the value is passed to the appropriate lookup API. If it is a number we want to make sure it is passed to the proper number lookup API.
 
+If you have a product name and want to get the ItemID use the following lookup API:
+```
+http://[hostname]]/resources/ecs/IBM/demo/[item_name]
+i.e. http://[hostname]]/resources/ecs/IBM/demo/generator
+```
+
+If you have an item number and want to get the product name, you need call the inventory lookup:
+```
+http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]
+i.e. http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/poughkeepsieny_8675309
+```
 The "isNumerical" node is a **switch** node which allows for the flow to change based on the conditions defined in the switch node details.
 ![Architecture Overview](/images/isnumerical-node.png)
 
@@ -480,10 +499,11 @@ As you can see in the image below where are two conditions in he "switch node".
 ![Architecture Overview](/images/isnumerical-node-details.png)
 
 The first condition evaluated is that a number value between 0 and 9999999 is stored in msg.payload.
-The second condition is the catch all condition, which in our case says, that if the values in msg.payload are not a number we wil pass it here.
+The second condition is the catch all condition, which in our case says, that if the values in msg.payload are not a number we wil pass through.
 
 Now look at the isNumerical node again, you will see two small gray circles on the right of the node.
 ![Architecture Overview](/images/isnumerical-node.png)
+
 Those two circles correspond to the two condition in the node details. The top circle is used for the number matching and the bottom circle is for the catch all.
 
 Remember from the prior exercise we showed an API that looked like the following:
@@ -501,6 +521,7 @@ The JSON object that gets created from the "set store_prefix" and from the "inje
 ``` 
 
 So now we want to create the URL by using the "Mustache" syntax.
+
 `http://[hostname]]/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}`
 
 This will take the "store_prefix" JSON value and the "payload" JSON value and add it to the end of the URL. We now need to add the http request to invoke the URL.
@@ -519,13 +540,21 @@ Change the name of the node to "item lookup".
 ![Architecture Overview](/images/item-lookup-node.png)
 
 Also paste the following url into the URL field.
+
 `http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}` 
+
 ![Architecture Overview](/images/item-lookup-detail.png)
 
-Make sure to change the "Return" value from "a UTF-8 string" to "a parsed JSON object"
+Make sure to change the "Return" value from **"a UTF-8 string" to "a parsed JSON object"**
 
-Close the detail view of the "item Lookup" node. Create a connection between the "Item lookup" and "Translate Debug" nodes. This will allow us to see what is returned from invoking the API.
-![Architecture Overview](/images/connect-itemid-debug-nodes.png)
+Close the detail view of the "item Lookup" node. 
+
+Create a link between the top circle of the switch "isNumerical" and the left side of the "Item look up".
+![Architecture Overview](/images/connect-switch-item-node.png)
+
+
+Create a connection between the "Item lookup" and "Translate Debug" nodes. This will allow us to see what is returned from invoking the API.
+![Architecture Overview](/images/connect-item-node-debug-node.png)
 
 Click the **Deploy** button at the top of the screen.
 
@@ -556,7 +585,12 @@ Remember our newly create REST API is supposed to only return the "Name" of a pr
 
 ![Architecture Overview](/images/function-node-pallet.png)
 
-Next delete the link between the "Item Lookup" node and the "Tranlate Debug" node. Create a new connection between the "Item Lookup" and the newly dropped "Function" node. Change the name of the "Function" node to "Parse out Name". This is done by double clicking on the "Function" node and changing the name. Your function node editor view should look like:
+Next delete the link between the "Item Lookup" node and the "Tranlate Debug" node. Create a new connection between the "Item Lookup" and the newly dropped "Function" node.
+Then connect the **right** side of the function node to the "Tranlate Debug" Node and the "Return Translated Name/Number" node. 
+
+![Architecture Overview](/images/item-parse-debug-flow.png)
+ 
+Change the name of the "Function" node to "Parse out Name". This is done by double clicking on the "Function" node and changing the name. Your function node editor view should look like:
 
 ![Architecture Overview](/images/parse-out-name-node.png)
 
@@ -607,13 +641,22 @@ Drag the **http request** node from the pallet to the flow editor.
 
 
 Change the name of the node to "name lookup" and add the following URL:
+
 ``http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload}}}``
 
 Notice in this URL the only attribute we are looking for is the "payload". The store number isn't needed. Aslo, make sure to change the "Return" value from "a UTF-8 string" to "a parsed JSON object".
 
 Click **Done** when finished.
 
-Now connect the "name lookup" to the "Parse out Itemid". You are just about done. Click the **Deploy** button at the top of the screen.
+Next connect to the bottom circle from "isNumerical" to the left side of your new Http Request node "Name Lookup"
+
+![Architecture Overview](/images/connect-switch-namelookup-flow.png)
+
+Now connect the "name lookup" to the "Parse out Itemid". You are just about done. 
+
+![Architecture Overview](/images/connect-namelookup-parseid-flow.png)
+
+Click the **Deploy** button at the top of the screen.
 
 ![Architecture Overview](/images/deploy-button.png)
 
