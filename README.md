@@ -676,6 +676,13 @@ Congrats you have completed exercise 2. The completed new service will make it e
 
 ## Exercise 3:
 Start a new tab in Node-RED, and paste in the nodes for Exercise 3. 
+
+In the right corner is a "plus sign". Click it to add a new flow within NodeRed.
+
+![Architecture Overview](/images/new-flow-plus-sign.png)
+
+Copy the code below and paste it into the new flow.
+
 ```JSON
 [
     {
@@ -1119,19 +1126,55 @@ Start a new tab in Node-RED, and paste in the nodes for Exercise 3.
     }
 ]
 ```
-This is a big one, and makes use of both the Weather Channel data, as well as the product information we have made available through our previous two exercises.
 
-The first thing to do is get your weather data http requests working. By default (and with good reason!), Node-RED does not export user credentials when you import/export, so you’ll have to enter in your own credentials here. These are not your w3 credentials, but the username/password specific to the Weather Channel Data service, which you’ll create in the next step.
+Your screen should look something like the following. You might have to move the copied flow around to make it more visible. 
 
-Go to bluemix.net and head over to Catalog, which will show you the list of services available. Find “Weather Company Data”, under Data & Analytics, and Create a new instance of this service, accepting the defaults. On the left-hand side, find “Service Credentials”and then “View Credentials”, which is where you’ll find the username/password. Enter this information into both http request nodes for the weather section of this flow.
+![Architecture Overview](/images/exercise-three-start-flow.png)
 
-![Architecture Overview](/images/credentials.png)
+This is a big one, and makes use of both Weather Channel data, as well as the product information we have made available through our previous two exercises.
 
+The first thing to do is get your weather data http requests working. By default (and with good reason!), 
+Node-RED does not export user credentials when you import/export, so you’ll have to enter in your own credentials here. 
+These are not your w3 credentials, but the username/password specific to the Weather Channel Data service, which you’ll create in the next step.
+
+Go to bluemix.net and head over to Catalog, which will show you the list of services available. 
+Find “Weather Company Data”, under Data & Analytics. Click ont he tile to create the service
+
+![Architecture Overview](/images/bluemix-weather-tile.png)
+
+Create a new instance of this service, accepting the defaults or give the service a unique name. Click **Create** when done.
+
+You should now have your newly created weather service on your BlueMix dashboard. Click on the newly created service
+
+![Architecture Overview](/images/bluemix-dashboard-weather.png)
+
+On the left-hand side, find “Service Credentials”and then “View Credentials”, which is where you’ll find the username/password. 
+
+![Architecture Overview](/images/bluemix-weather-credentials.png)
+
+Go back to your newly created "NodeRed flow". There are two "http request" nodes that need to be updated. 
+These nodes are pointing to the weather.com REST API's. They need to have the credentials added, so you can invoke the API's.
+
+![Architecture Overview](/images/http-request-weather-nodes.png)
+
+Double click on the **http request** to the right of the  "json" node. This "http request" node is calling the weather.com API to locate geo coordinates for a city. In our case, the city name is "Dallas".
+So a city name is sent into the http request the longitude and latitude are returned from the API. In order for the node to work properly, you need to click on the **Use basic authentication** button.
+
+![Architecture Overview](/images/http-request-node-detail-basicauth.png)
+
+Paste your **username** and **password** from your weather BlueMix service.
+
+![Architecture Overview](/images/http-request-node-detail-basicauth-filled.png)
+
+Enter this same information into the other "http request" node. This second node is used to call the "48 hour" forecast, for a geo location. Remember the geo location came from the prior http request to the weather API. 
+
+![Architecture Overview](/images/http-request-node-detail-url-forecast.png)
 
 
 With your credentials entered, you should be able to access a web page by heading to [name].mybluemix.net/weather.
 
-It will return a list of weather-related items.
+It will return a list of weather-related items. 
+
 Note: You'll note that the page returns in a different order each time. This is because calls made after the "Split" node are being made asynchronously and returned as soon as they complete. If order were important, we could write a function to order them.
 
 Right now, the page is only showing five items, but the inventory actually has ten weather-related items. Update the page so it shows information for all of them. The keys for these items are:
