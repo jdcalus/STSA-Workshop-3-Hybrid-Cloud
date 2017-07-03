@@ -241,7 +241,7 @@ The flow accepts a GET request, and uses the information in the GET querystring 
 
 
 
-- Do the same thing for the "Test Store Lookup"
+- Do the same thing for the "Test Store Lookup", by clicking on the **Test Store Lookup** inject node.
 
 What you see is probably not what you expect.
 ![Architecture Overview](/images/store-lookup-debug.png)
@@ -262,6 +262,7 @@ http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]
 
 So, for example, if we wanted to look up the status of an item in the Poughkeepsie, NY store location, we would use the following key:
 
+`http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/poughkeepsieny_8675309`
 
 `http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload.storeprefix}}}_{{{payload.itemnumber}}}`
 
@@ -1188,7 +1189,7 @@ We need to highlight the weather-related items that are below recommended invent
 
 If you need help finding the values for these comparisons, check the various Function nodes where we moved values out of payload and into other objects. Also, if you're having trouble figuring out the correct keys to use for the store inventory, turn on the CICS debug node for the full output, which should contain some clues.
 
-##Exercise 5:
+## Exercise 5:
 You probably noticed there were a few fields in the key/value store that were not used, such as tags, and location code. There is also a ton of information returned from the Weather Channel Data service that we didn't use for this example. 
 
 What are some ways the page, or the individual services, could be improved by taking into consideration this additional data? Or, using the data that we already have, what additional services could we provide to developers who are building their own applications?
