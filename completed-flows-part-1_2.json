@@ -1,0 +1,389 @@
+[
+    {
+        "id": "c2b1ddad.ba152",
+        "type": "tab",
+        "label": "Flow 1"
+    },
+    {
+        "id": "e911bbb8.81ea68",
+        "type": "http in",
+        "z": "c2b1ddad.ba152",
+        "name": "Item Lookup",
+        "url": "/itemlookup",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 239,
+        "y": 173,
+        "wires": [
+            [
+                "31870cf.d543af4"
+            ]
+        ]
+    },
+    {
+        "id": "1db1dab5.ca2775",
+        "type": "http response",
+        "z": "c2b1ddad.ba152",
+        "name": "Return ItemID",
+        "x": 996,
+        "y": 182.25,
+        "wires": []
+    },
+    {
+        "id": "31870cf.d543af4",
+        "type": "http request",
+        "z": "c2b1ddad.ba152",
+        "name": "Company Item Lookup",
+        "method": "GET",
+        "ret": "obj",
+        "url": "http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload.name}}}",
+        "tls": "",
+        "x": 574.5,
+        "y": 180.75,
+        "wires": [
+            [
+                "1db1dab5.ca2775",
+                "72825236.353acc"
+            ]
+        ]
+    },
+    {
+        "id": "da60181f.8b0188",
+        "type": "http in",
+        "z": "c2b1ddad.ba152",
+        "name": "Inventory Lookup",
+        "url": "/inventorylookup",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 246,
+        "y": 249,
+        "wires": [
+            [
+                "a1190279.ecf5d"
+            ]
+        ]
+    },
+    {
+        "id": "5444dab4.b27414",
+        "type": "http response",
+        "z": "c2b1ddad.ba152",
+        "name": "Return Store Inventory",
+        "x": 1018,
+        "y": 250.25,
+        "wires": []
+    },
+    {
+        "id": "a1190279.ecf5d",
+        "type": "http request",
+        "z": "c2b1ddad.ba152",
+        "name": "Store Lookup",
+        "method": "GET",
+        "ret": "obj",
+        "url": "http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload.storeprefix}}}_{{{payload.itemnumber}}}",
+        "tls": "",
+        "x": 587.5,
+        "y": 245.75,
+        "wires": [
+            [
+                "5444dab4.b27414",
+                "72825236.353acc"
+            ]
+        ]
+    },
+    {
+        "id": "72825236.353acc",
+        "type": "debug",
+        "z": "c2b1ddad.ba152",
+        "name": "CICS Replies",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 805.5,
+        "y": 214.5,
+        "wires": []
+    },
+    {
+        "id": "fc080dca.c6f67",
+        "type": "inject",
+        "z": "c2b1ddad.ba152",
+        "name": "Test Store Lookup",
+        "topic": "",
+        "payload": "{\"itemnumber\":\"78707740\",\"storeprefix\":\"sample_store\"}",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 239.5,
+        "y": 359.25,
+        "wires": [
+            [
+                "a57fafc3.08cb9"
+            ]
+        ]
+    },
+    {
+        "id": "a57fafc3.08cb9",
+        "type": "json",
+        "z": "c2b1ddad.ba152",
+        "name": "",
+        "x": 455.5,
+        "y": 353.75,
+        "wires": [
+            [
+                "a1190279.ecf5d"
+            ]
+        ]
+    },
+    {
+        "id": "57eab92e.952f08",
+        "type": "inject",
+        "z": "c2b1ddad.ba152",
+        "name": "Test Item Lookup (by name)",
+        "topic": "",
+        "payload": "{\"name\":\"bucket\"}",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 270,
+        "y": 316,
+        "wires": [
+            [
+                "a46753a.704aeb"
+            ]
+        ]
+    },
+    {
+        "id": "a46753a.704aeb",
+        "type": "json",
+        "z": "c2b1ddad.ba152",
+        "name": "",
+        "x": 460,
+        "y": 314.5,
+        "wires": [
+            [
+                "31870cf.d543af4"
+            ]
+        ]
+    },
+    {
+        "id": "4defc35c.3b3f9c",
+        "type": "switch",
+        "z": "c2b1ddad.ba152",
+        "name": "IsNumerical",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "[0-9999999999999999]",
+                "vt": "str",
+                "case": false
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 742,
+        "y": 501,
+        "wires": [
+            [
+                "b97502fb.a11af"
+            ],
+            [
+                "6561f2a5.9628dc"
+            ]
+        ]
+    },
+    {
+        "id": "32684e7d.f66ee2",
+        "type": "inject",
+        "z": "c2b1ddad.ba152",
+        "name": "generator",
+        "topic": "",
+        "payload": "generator",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 221,
+        "y": 484.5,
+        "wires": [
+            [
+                "ac10c21b.55d08"
+            ]
+        ]
+    },
+    {
+        "id": "d93fe9d8.42e538",
+        "type": "http in",
+        "z": "c2b1ddad.ba152",
+        "name": "Translate Name/Number",
+        "url": "/translate",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 199.5,
+        "y": 540.25,
+        "wires": [
+            [
+                "ac10c21b.55d08"
+            ]
+        ]
+    },
+    {
+        "id": "a7e58609.cbcbe8",
+        "type": "http response",
+        "z": "c2b1ddad.ba152",
+        "name": "Return Translated Name/Number",
+        "x": 994.5,
+        "y": 695.25,
+        "wires": []
+    },
+    {
+        "id": "91efc588.b22888",
+        "type": "comment",
+        "z": "c2b1ddad.ba152",
+        "name": "Look up ItemID to get the Name",
+        "info": "",
+        "x": 286.7499694824219,
+        "y": 689.7500610351562,
+        "wires": []
+    },
+    {
+        "id": "e577c9eb.0db1d8",
+        "type": "comment",
+        "z": "c2b1ddad.ba152",
+        "name": "Look up the Name to get the Itemid",
+        "info": "",
+        "x": 287,
+        "y": 849,
+        "wires": []
+    },
+    {
+        "id": "a659bee4.b8ec1",
+        "type": "comment",
+        "z": "c2b1ddad.ba152",
+        "name": "Return the appropriate value to the HTTP Out node",
+        "info": "",
+        "x": 1031,
+        "y": 740.7500610351562,
+        "wires": []
+    },
+    {
+        "id": "ac10c21b.55d08",
+        "type": "function",
+        "z": "c2b1ddad.ba152",
+        "name": "Set store_prefix",
+        "func": "msg.store_prefix = \"sample_store\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 524,
+        "y": 502,
+        "wires": [
+            [
+                "4defc35c.3b3f9c"
+            ]
+        ]
+    },
+    {
+        "id": "9a014e8b.49fa6",
+        "type": "function",
+        "z": "c2b1ddad.ba152",
+        "name": "Parse out Itemid",
+        "func": "msg.payload = msg.payload.itemid;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 526,
+        "y": 880,
+        "wires": [
+            [
+                "a7e58609.cbcbe8",
+                "86502e43.c32a"
+            ]
+        ]
+    },
+    {
+        "id": "86502e43.c32a",
+        "type": "debug",
+        "z": "c2b1ddad.ba152",
+        "name": "Translate Debug",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 939,
+        "y": 661.75,
+        "wires": []
+    },
+    {
+        "id": "c4717c3.7916f8",
+        "type": "inject",
+        "z": "c2b1ddad.ba152",
+        "name": "19645922",
+        "topic": "",
+        "payload": "19645922",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 210.5,
+        "y": 592.25,
+        "wires": [
+            [
+                "ac10c21b.55d08"
+            ]
+        ]
+    },
+    {
+        "id": "b97502fb.a11af",
+        "type": "http request",
+        "z": "c2b1ddad.ba152",
+        "name": "item look up",
+        "method": "GET",
+        "ret": "obj",
+        "url": "http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}",
+        "tls": "",
+        "x": 328.5,
+        "y": 742,
+        "wires": [
+            [
+                "4f5cc4e0.2874fc"
+            ]
+        ]
+    },
+    {
+        "id": "4f5cc4e0.2874fc",
+        "type": "function",
+        "z": "c2b1ddad.ba152",
+        "name": "Parse out Name",
+        "func": "\tmsg.payload = msg.payload.name;\n\treturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 616.5,
+        "y": 758,
+        "wires": [
+            [
+                "86502e43.c32a",
+                "a7e58609.cbcbe8"
+            ]
+        ]
+    },
+    {
+        "id": "6561f2a5.9628dc",
+        "type": "http request",
+        "z": "c2b1ddad.ba152",
+        "name": "name lookup",
+        "method": "GET",
+        "ret": "obj",
+        "url": "http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload}}}",
+        "tls": "",
+        "x": 267.5,
+        "y": 903,
+        "wires": [
+            [
+                "9a014e8b.49fa6"
+            ]
+        ]
+    }
+]

@@ -1,0 +1,495 @@
+[
+    {
+        "id": "df7f9884.e97478",
+        "type": "tab",
+        "label": "Flow 3"
+    },
+    {
+        "id": "268c8ee7.3aa4a2",
+        "type": "http request",
+        "z": "df7f9884.e97478",
+        "name": "Name to Number",
+        "method": "GET",
+        "ret": "obj",
+        "url": "https://stsa-retail.mybluemix.net/itemlookup?name={{{payload}}}",
+        "tls": "",
+        "x": 598,
+        "y": 602.7499389648438,
+        "wires": [
+            [
+                "25f0d667.8a381a",
+                "76cd53ef.d36b6c"
+            ]
+        ]
+    },
+    {
+        "id": "25f0d667.8a381a",
+        "type": "http request",
+        "z": "df7f9884.e97478",
+        "name": "Get Local Store Info",
+        "method": "GET",
+        "ret": "obj",
+        "url": "https://stsa-retail.mybluemix.net/inventorylookup?storeprefix=sample_store&itemnumber={{{payload.itemid}}}",
+        "tls": "",
+        "x": 843.7500610351562,
+        "y": 602,
+        "wires": [
+            [
+                "8f7549ee.56a8b8",
+                "a911328d.1308b"
+            ]
+        ]
+    },
+    {
+        "id": "2d0b5839.ef1948",
+        "type": "http request",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "url": "https://twcservice.mybluemix.net/api/weather/v1/geocode/{{{payload}}}/forecast/hourly/48hour.json",
+        "tls": "",
+        "x": 322.2738342285156,
+        "y": 372.63092041015625,
+        "wires": [
+            [
+                "f00653f5.ec963",
+                "d193f26d.1e7fb"
+            ]
+        ]
+    },
+    {
+        "id": "bd7a252e.f00758",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Format Data",
+        "func": "msg.lat = msg.payload.location.latitude[0]; \nmsg.long = msg.payload.location.longitude[0]; \nmsg.payload = msg.lat+\"/\"+msg.long; \n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 820.4166870117188,
+        "y": 302.05950927734375,
+        "wires": [
+            [
+                "2d0b5839.ef1948"
+            ]
+        ]
+    },
+    {
+        "id": "9e8c1a2c.f7b088",
+        "type": "inject",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "topic": "",
+        "payload": "{\"search\":\"Des Moines\"}",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 209.75,
+        "y": 435.14306640625,
+        "wires": [
+            [
+                "3dd122d8.7d9b8e"
+            ]
+        ]
+    },
+    {
+        "id": "f00653f5.ec963",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Save PoP",
+        "func": "msg.pop = msg.payload.forecasts[0].pop;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 577,
+        "y": 377.5,
+        "wires": [
+            [
+                "e24930a.08479d",
+                "36534ad1.11fad6"
+            ]
+        ]
+    },
+    {
+        "id": "e86b1714.4d2848",
+        "type": "http in",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "url": "/weather",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 161.75,
+        "y": 121.5,
+        "wires": [
+            [
+                "d70e0e89.96b1d",
+                "39b09e43.aace42"
+            ]
+        ]
+    },
+    {
+        "id": "525386c3.2ee3f8",
+        "type": "http response",
+        "z": "df7f9884.e97478",
+        "name": "Web Response",
+        "x": 815.9999389648438,
+        "y": 1148,
+        "wires": []
+    },
+    {
+        "id": "1b9ee766.f78649",
+        "type": "template",
+        "z": "df7f9884.e97478",
+        "name": "Template",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html>\n<head>\n\t<title>Store Inventory</title>\n</head>\n<style>\n    body {\n        background-color: #26343F;\n    }\n    .main {\n        background-size: 100%;\n        background-repeat: repeat-x;\n        background: linear-gradient(to top right, rgba(29, 54, 73, 1), rgba(45, 63, 74, 0.98)), url(http://roadshow.mybluemix.net/images/i-l-pattern.png);\n    }\n    .logo {\n\t    font-size:16px; \n\t    color: white;\n\t    font-family: sans-serif;\n\t    margin-top:12px; \n\t    padding-left:10px; \n\t    margin-bottom:15px;\n\t    display:inline-block;\n\t}\n\t.title {\n\t    font-size:48px; \n\t    color: white;\n\t    font-family: sans-serif;\n\t    margin-top:50px; \n\t    padding-left:90px; \n\t    margin-bottom:0px;\n\t    display:inline-block;\n\t}\n    .sub-title {\n\t    font-size:24px; \n\t    color: #41D6C3;\n\t    font-family: sans-serif;\n\t    margin-top:10px; \n\t    padding-left:90px; \n\t    margin-bottom:0px;\n\t    display:block;\n\t}\n</style>\n<body>\n\t<span class=\"logo\" >IBM <b>Bluemix</b></span>\n\t<section class=\"main\">\n\t\t<div class=\"title\">Weather Preparedness Portal</div>\n\t\t<div class=\"sub-title\"><div>\n\t\t{{{formatted_items}}}\n\t</section>\n\t<span></span>\n</body>\n</html>",
+        "x": 432,
+        "y": 1149.25,
+        "wires": [
+            [
+                "408d5a8c.8d9cc4"
+            ]
+        ]
+    },
+    {
+        "id": "bc52a79f.206938",
+        "type": "split",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "splt": ",",
+        "x": 422.25,
+        "y": 602,
+        "wires": [
+            [
+                "268c8ee7.3aa4a2"
+            ]
+        ]
+    },
+    {
+        "id": "b47029d5.3e4338",
+        "type": "join",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "",
+        "timeout": "2",
+        "count": "",
+        "x": 411,
+        "y": 890.2500610351562,
+        "wires": [
+            [
+                "17de5b6e.cb0455"
+            ]
+        ]
+    },
+    {
+        "id": "408d5a8c.8d9cc4",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "header",
+        "func": "msg.headers = {'Content-Type': 'text/html'};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 615.0000610351562,
+        "y": 1154.75,
+        "wires": [
+            [
+                "525386c3.2ee3f8"
+            ]
+        ]
+    },
+    {
+        "id": "8f7549ee.56a8b8",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Iterate and Format",
+        "func": "msg.inventory = msg.payload;\n   msg.payload = \"<p>\";\n   msg.payload += msg.inventory.name\n   msg.payload += \" (\"+msg.inventory.inventory+\")\"\nreturn msg\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 672.75,
+        "wires": [
+            [
+                "c94715f8.63d998",
+                "b47029d5.3e4338"
+            ]
+        ]
+    },
+    {
+        "id": "17de5b6e.cb0455",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Formatted",
+        "func": "msg.formatted_items = msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 589.25,
+        "y": 891.75,
+        "wires": [
+            [
+                "1b9ee766.f78649"
+            ]
+        ]
+    },
+    {
+        "id": "d70e0e89.96b1d",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Dallas Search",
+        "func": "msg.city = {\"search\":\"Dallas\"}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 171.5,
+        "y": 300.4999694824219,
+        "wires": [
+            [
+                "ff03cee8.5bcf2"
+            ]
+        ]
+    },
+    {
+        "id": "36534ad1.11fad6",
+        "type": "debug",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "pop",
+        "x": 824.75,
+        "y": 368,
+        "wires": []
+    },
+    {
+        "id": "b3663128.0527d",
+        "type": "comment",
+        "z": "df7f9884.e97478",
+        "name": "HTTP In kicks off the flow with a comma-seperated list of weather-related items. ",
+        "info": "",
+        "x": 397.5,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "e097e144.08f99",
+        "type": "comment",
+        "z": "df7f9884.e97478",
+        "name": "The list gets split out, each item gets checked in the store's inventory, formatted, and combined back together",
+        "info": "",
+        "x": 531.5,
+        "y": 546.5,
+        "wires": []
+    },
+    {
+        "id": "9d2e7320.9649b",
+        "type": "comment",
+        "z": "df7f9884.e97478",
+        "name": "Looking up the weather information for a specific city, we determine the likelyhood of rain (PoP)",
+        "info": "",
+        "x": 444.25,
+        "y": 257.5,
+        "wires": []
+    },
+    {
+        "id": "ece21a9d.1895f8",
+        "type": "comment",
+        "z": "df7f9884.e97478",
+        "name": "Build a web page and return it to the original HTTP requestor",
+        "info": "",
+        "x": 545,
+        "y": 1105.25,
+        "wires": []
+    },
+    {
+        "id": "82094de1.c8702",
+        "type": "switch",
+        "z": "df7f9884.e97478",
+        "name": "Check Reorder Level",
+        "property": "inventory",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "20",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 874.5,
+        "y": 685.2499389648438,
+        "wires": [
+            [
+                "f5f51743.abee88"
+            ],
+            [
+                "b47029d5.3e4338"
+            ]
+        ]
+    },
+    {
+        "id": "f5f51743.abee88",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Add Rain Icon",
+        "func": "msg.payload += \"<img src = \\\"http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/rain.png\\\">\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1117,
+        "y": 681.25,
+        "wires": [
+            [
+                "b47029d5.3e4338"
+            ]
+        ]
+    },
+    {
+        "id": "e24930a.08479d",
+        "type": "function",
+        "z": "df7f9884.e97478",
+        "name": "Weather Items",
+        "func": "msg.payload = 'flashlight,bucket,boots,ducttape,generator'\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 261.5,
+        "y": 600.75,
+        "wires": [
+            [
+                "bc52a79f.206938"
+            ]
+        ]
+    },
+    {
+        "id": "d193f26d.1e7fb",
+        "type": "debug",
+        "z": "df7f9884.e97478",
+        "name": "weather",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 938.375,
+        "y": 237.625,
+        "wires": []
+    },
+    {
+        "id": "3dd122d8.7d9b8e",
+        "type": "http request",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "url": "https://twcservice.mybluemix.net/api/weather/v3/location/search?language=en_US&locationType=city&query={{payload.search}}",
+        "tls": "",
+        "x": 580.25,
+        "y": 298.25,
+        "wires": [
+            [
+                "bd7a252e.f00758"
+            ]
+        ]
+    },
+    {
+        "id": "ff03cee8.5bcf2",
+        "type": "json",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "x": 364.625,
+        "y": 302.9375,
+        "wires": [
+            [
+                "3dd122d8.7d9b8e"
+            ]
+        ]
+    },
+    {
+        "id": "c94715f8.63d998",
+        "type": "debug",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 929.625,
+        "y": 461.375,
+        "wires": []
+    },
+    {
+        "id": "90755d95.d8e6b",
+        "type": "switch",
+        "z": "df7f9884.e97478",
+        "name": "Check Weather Status",
+        "property": "pop",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "60",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 620.875,
+        "y": 685.4375,
+        "wires": [
+            [
+                "82094de1.c8702"
+            ],
+            [
+                "b47029d5.3e4338"
+            ]
+        ]
+    },
+    {
+        "id": "76cd53ef.d36b6c",
+        "type": "debug",
+        "z": "df7f9884.e97478",
+        "name": "NametoNumber",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1118.5,
+        "y": 530,
+        "wires": []
+    },
+    {
+        "id": "a911328d.1308b",
+        "type": "debug",
+        "z": "df7f9884.e97478",
+        "name": "GetStoreInfo",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1148.5,
+        "y": 591,
+        "wires": []
+    },
+    {
+        "id": "39b09e43.aace42",
+        "type": "link out",
+        "z": "df7f9884.e97478",
+        "name": "",
+        "links": [
+            "dee1290a.9f2a78"
+        ],
+        "x": 518.125,
+        "y": 122.5,
+        "wires": []
+    }
+]

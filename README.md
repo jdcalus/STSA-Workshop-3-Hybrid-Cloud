@@ -1,32 +1,32 @@
 # Workshop 3 Hybrid Heterogeneous Cloud
 
 ## Introduction
-In this workshop, we’ll work with APIs through Node-RED to use and create services for a weather preparedness situation. 
+In this workshop, we’ll work with APIs through Node-RED to use and create services for a weather preparedness situation.
 
-The fictitious company we’re working with is a large retail company that centralizes their core business assets, but still utilizes public cloud APIs to extend their functionality. At the heart of operations is a large key/value store system, which holds information about products as well as inventory information for each store. 
+The fictitious company we’re working with is a large retail company that centralizes their core business assets, but still utilizes public cloud APIs to extend their functionality. At the heart of operations is a large key/value store system, which holds information about products as well as inventory information for each store.
 
-This lab uses Node-RED, and you can either use an existing instance, or create a new one. Either way, make note of the instance name so you can easily reference the web page and ReST interfaces. 
+This lab uses Node-RED, and you can either use an existing instance, or create a new one. Either way, make note of the instance name so you can easily reference the web page and ReST interfaces.
 
 You may also wish to use a ReST client to test the APIs, and view debug data. Some popular ReST clients include RESTClient for Firefox (http://restclient.net/) and Restlet Client for Chrome (https://restlet.com/modules/client/)
 
-Using a ReST client is typically done by specifying the HTTP directive (a GET, which typically requests information, for example) and an address, like this:
+Using a REST client is typically done by specifying the HTTP directive (a GET, for example, which typically requests information) and an address, like this:
 
 ![Architecture Overview](/images/rest_client.png)
 
 
-The important fields to note here are the Method, URL, Response, and Body. The Method is the HTTP verb that is being performed against the HTTP endpoint. For our examples here, we will only be reading data, so we will be performing a GET. For the curious, a POST is typically used to create new objects, PUT is used to update existing objects, and DELETE is used to delete existing objects. There are more verbs, but these are the main four. 
+The important fields to note here are the Method, URL, Response, and Body. The Method is the HTTP verb that is being performed against the HTTP endpoint. For our examples here, we will only be reading data, so we will be performing a GET. For the curious, a POST is typically used to create new objects, PUT is used to update existing objects, and DELETE is used to delete existing objects. There are more verbs, but these are the main four.
 
-Next is the URL, which represents the object we are acting upon. If it looks like a website url, that’s because ReST-ful APIs use HTTP mechanisms to facilitate communication, and that’s essentially what it is; a web address. It probably won’t work if you put it into a web browser, though, it is meant to be called from a client or code that can handle the input and output correctly. 
+Next is the URL, which represents the object we are acting upon. If it looks like a website url, that’s because ReST-ful APIs use HTTP mechanisms to facilitate communication, and that’s essentially what it is; a web address. It probably won’t work if you put it into a web browser, though, it is meant to be called from a client or code that can handle the input and output correctly.
 
-This familiarity is what makes it so easy for just about any programming language to support ReST-ful APIs without the need for specific libraries and connectors. As long as someone’s program can reach out to a web server, it can initiate an API. 
+This familiarity is what makes it so easy for just about any programming language to support ReST-ful APIs without the need for specific libraries and connectors. As long as someone’s program can reach out to a web server, it can initiate an API.
 
-The Response is simply the output from the web service. If issuing a GET, this is where you’ll find the requested object. For POST, PUT, and DELETEs, you will most likely only get the response code. Just like HTTP, 200 means OK, everything worked correctly, though some services will pass back additional information that may be helpful to the creator. 
+The Response is simply the output from the web service. If issuing a GET, this is where you’ll find the requested object. For POST, PUT, and DELETEs, you will most likely only get the response code. Just like HTTP, 200 means OK, everything worked correctly, though some services will pass back additional information that may be helpful to the creator.
 
-When making a POST or PUT, we have to send along the data to be created or updated. This is where we use the Body of a ReST call. For this lab, we will not be making POSTs or PUTs, so we won’t have to worry about this. 
+When making a POST or PUT, we have to send along the data to be created or updated. This is where we use the Body of a ReST call. For this lab, we will not be making POSTs or PUTs, so we won’t have to worry about this.
 
 ## Exercise 1:
 
-We need to begin by putting the starter code into a new Node-RED workspace. This can be done by using the menu button on the top right corner of Node-RED, and then selecting Import -> Clipboard. Paste the code in here and click Import. 
+We need to begin by putting the starter code into a new Node-RED workspace. This can be done by using the menu button on the top right corner of Node-RED, and then selecting Import -> Clipboard. Paste the code in the editor and make sure to select **new flow**  here and click Import.
 ```JSON
 [
     {
@@ -194,7 +194,7 @@ We need to begin by putting the starter code into a new Node-RED workspace. This
 ]
 ```
 
-![Architecture Overview](/images/import_code.png)
+![Architecture Overview](/images/import-code.png)
 
 
 We have two very simple services here. In fact, they're so simple, they do very little beyond what the service they're calling does. We'll start here, however, just so you get a basic understanding of using services to build functionality.
@@ -202,12 +202,12 @@ We have two very simple services here. In fact, they're so simple, they do very 
 ![Architecture Overview](/images/first_two_flows.png)
 
 
-There are two types of boxes that will help you debug your code throughout this lab; 
-the Inject box and the Debug box. Clicking the square on the left side of a light-blue 
-Inject box sends a specific piece of data into a flow. This can be used to emulate a web 
-call or device input, and can only be used as input sources. The dark green node, called 
-the Debug node, grabs the values of a particular object and displays it on the Debug panel 
-on the right side of your screen. Debug nodes can be temporarily deactivated by clicking on 
+There are two types of boxes that will help you debug your code throughout this lab;
+the Inject box and the Debug box. Clicking the square on the left side of a light-blue
+Inject box sends a specific piece of data into a flow. This can be used to emulate a web
+call or device input, and can only be used as input sources. The dark green node, called
+the Debug node, grabs the values of a particular object and displays it on the Debug panel
+on the right side of your screen. Debug nodes can be temporarily deactivated by clicking on
 the green square on the right side.   
 
 ![Architecture Overview](/images/inject_debug.png)
@@ -220,12 +220,11 @@ Double click on the **Inject** node and replace the values as follows:
 Double click on the debug node and change the name:
 ![Architecture Overview](/images/debug-hello.png)
 
-- Now click on the **Deploy** button at the top of the screen.
-		You can now click on the left side of the "Hello World" and you should see the output in the debug panel
-		![Architecture Overview](/images/hello-debug-panel.png)		
+- Now click on the **Deploy** button at the top of the screen. You can now click on the left side of the "Hello World" and you should see the output in the debug panel
+	![Architecture Overview](/images/hello-debug-panel.png)		
 
 The first line is a service, and should already work. You can test it and view the debug output using those Inject and Debug nodes.   
-- Click on the inject button for the "Test Item Lookup" 
+- Click on the inject button for the "Test Item Lookup"
 
 ![Architecture Overview](/images/inject-test-item-lookup-node.png)
 
@@ -234,7 +233,7 @@ Your output in the debug panel should look like:
 ![Architecture Overview](/images/test-item-lookup-debug.png)
 
 
-The flow accepts a GET request, and uses the information in the GET querystring to perform its own GET request to the inventory key/value store, which is running out of CICS. It then simply takes the response and sends it back out to the original requestor. By opening the node for the HTTP call, you can see how the item name is substituted in the url by use of triple curly braces. {{{like.this}}} 
+The flow accepts a GET request, and uses the information in the GET querystring to perform its own GET request to the inventory key/value store, which is running out of CICS. It then simply takes the response and sends it back out to the original requestor. By opening the node for the HTTP call, you can see how the item name is substituted in the url by use of triple curly braces. {{{like.this}}}
 
 ![Architecture Overview](/images/http_request.png)
 
@@ -247,7 +246,7 @@ What you see is probably not what you expect.
 ![Architecture Overview](/images/store-lookup-debug.png)
 As you can see in the debug panel there is an error "No url specified". This is because the "HTTP Node" is not configured properly.
 
-- Double click on the **Store Lookup"** node
+- Double click on the **Store Lookup** node
 ![Architecture Overview](/images/http-store-lookup-node.png)
 
 This intentionally doesn't work so we need to fix it. The "URL" field was left empty.
@@ -271,14 +270,16 @@ So, for example, if we wanted to look up the status of an item in the Poughkeeps
 
 Your HTTP REST call should look fairly similar to the first one, except that you'll be using the triple-curly-braces to substitute two parameters instead of one. Remember the formatting above.
 
-When done, you should have two services, and both Test buttons should return something looking like item information from the CICS Replies debug node.
+Click the **done** and then the **Deploy** button.
 
-Tip: Don't worry if you see a "No Response Object" warning while testing with the buttons. Since we're calling it from a manual inject, and not an HTTP request, the HTTP response node gets confused, but it'll work just fine when we call it as a real service. 
+When completed, you should have two services, and both Test buttons should return something looking like item information from the CICS Replies debug node.
+
+Tip: Don't worry if you see a "No Response Object" warning while testing with the buttons. Since we're calling it from a manual inject, and not an HTTP request, the HTTP response node gets confused, but it'll work just fine when we call it as a real service.
 
 You can also drive these services from a REST client, by using the addresses noted in the HTTP In nodes.
 
 
- 
+
 ## Exercise 2:
 So far, we've just created two simple services, and they don't do much on their own, but it's time to make a service that provides a little more value.
 
@@ -459,7 +460,7 @@ Copy and paste the code for Exercise #2 below your existing services and take a 
 ![Architecture Overview](/images/exercise-two-initial-view.png)
 
 
-Following the flow from left to right. We have an "HTTP In" (Translate Name/Number) node, which we can view as an API endpoint for others to call. 
+Following the flow from left to right. We have an "HTTP In" (Translate Name/Number) node, which we can view as an API endpoint for others to call.
 There are also two Test Inject buttons "(generator)" and "(19645922)" which you can use to easily debug your code. These simulate the API being called.
 The basic principle of this API is to allow the user to send an "itemID" and get a "product name" in response. or sent a "product name" and get an "ItemID" in response.
 
@@ -471,15 +472,15 @@ or
 http://[hostname]]/resources/ecs/IBM/demo/[item_name]
 ```
 
-Next, if you double click on the "Set store prefix" 
+Next, if you double click on the "Set store prefix"
 ![Architecture Overview](/images/set-store-prefix-node.png)
 
 You will see that the we set the "msg.store_prefix" attribute of the JSON object to "sample_store"
 ![Architecture Overview](/images/set-store-prefix-node-details.png)
 
-We are using  "sample_store" as our store prefix, because data is already populated on zOS for this store prefix. 
+We are using  "sample_store" as our store prefix, because data is already populated on zOS for this store prefix.
 
-Next is the "IsNumerical" node. It uses Regex to figure out if the incoming payload is text or numerical. 
+Next is the "IsNumerical" node. It uses Regex to figure out if the incoming payload is text or numerical.
 If it's text (an item name), we will want to make sure the value is passed to the appropriate lookup API. If it is a number we want to make sure it is passed to the proper number lookup API.
 
 If you have a product name and want to get the ItemID use the following lookup API:
@@ -496,7 +497,7 @@ i.e. http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/poughkeepsieny_8
 The "isNumerical" node is a **switch** node which allows for the flow to change based on the conditions defined in the switch node details.
 ![Architecture Overview](/images/isnumerical-node.png)
 
-As you can see in the image below where are two conditions in he "switch node".
+As you can see in the image below there are two conditions in he "switch node".
 ![Architecture Overview](/images/isnumerical-node-details.png)
 
 The first condition evaluated is that a number value between 0 and 9999999 is stored in msg.payload.
@@ -519,7 +520,7 @@ The JSON object that gets created from the "set store_prefix" and from the "inje
 "store_prefix":"sample_store",
 "payload":"19645922"
 }
-``` 
+```
 
 So now we want to create the URL by using the "Mustache" syntax.
 
@@ -531,7 +532,7 @@ Drag the **http request** node from the pallet to the flow editor.
 
 ![Architecture Overview](/images/http-request-node.png)
 
- Now **double click** the node. 
+ Now **double click** the node.
 
 ![Architecture Overview](/images/http-request-editor-node.png)
 
@@ -542,13 +543,13 @@ Change the name of the node to "item lookup".
 
 Also paste the following url into the URL field.
 
-`http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}` 
+`http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{store_prefix}}}_{{{payload}}}`
 
 ![Architecture Overview](/images/item-lookup-detail.png)
 
 Make sure to change the "Return" value from **"a UTF-8 string" to "a parsed JSON object"**
 
-Close the detail view of the "item Lookup" node. 
+Close the detail view of the "item Lookup" node.
 
 Create a link between the top circle of the switch "isNumerical" and the left side of the "Item look up".
 ![Architecture Overview](/images/connect-switch-item-node.png)
@@ -564,7 +565,7 @@ Click the **Deploy** button at the top of the screen.
 This will push your updates to the server on BlueMix.
 
 
-Next, click on the left side of the **Inject** node that has "19645922". This causes the inject to be fired and the flow to be executed.
+Next, click on the left side of the **Inject** node that has "19645922". This causes the inject to be fired and the flow to be executed. Make sure the debug node is toggled to display the output.
 
 ![Architecture Overview](/images/inject-itemid-node.png)
 
@@ -586,11 +587,11 @@ Remember our newly create REST API is supposed to only return the "Name" of a pr
 
 ![Architecture Overview](/images/function-node-pallet.png)
 
-Next delete the link between the "Item Lookup" node and the "Tranlate Debug" node. Create a new connection between the "Item Lookup" and the newly dropped "Function" node.
-Then connect the **right** side of the function node to the "Tranlate Debug" Node and the "Return Translated Name/Number" node. 
+Next delete the link between the "Item Lookup" node and the "Translate Debug" node. Create a new connection between the "Item Lookup" and the newly dropped "Function" node.
+Then connect the **right** side of the function node to the "Translate Debug" Node and the "Return Translated Name/Number" node.
 
 ![Architecture Overview](/images/item-parse-debug-flow.png)
- 
+
 Change the name of the "Function" node to "Parse out Name". This is done by double clicking on the "Function" node and changing the name. Your function node editor view should look like:
 
 ![Architecture Overview](/images/parse-out-name-node.png)
@@ -602,7 +603,7 @@ Make sure to paste the following code into the function editor
 	return msg;
 ```
 
-Click **Done** when finished. 
+Click **Done** when finished.
 
 
 The above code is taking the results "msg.payload.name" from the JSON that was returned from the API call and reassigning the "msg.payload" with the name value. This is because our newly created REST API is only supposed to return a name, if the itemID is supplied.
@@ -636,7 +637,7 @@ Drag the **http request** node from the pallet to the flow editor.
 
 ![Architecture Overview](/images/http-request-node.png)
 
- Now **double click** the node. 
+ Now **double click** the node.
 
 ![Architecture Overview](/images/http-request-editor-node.png)
 
@@ -653,7 +654,7 @@ Next connect to the bottom circle from "isNumerical" to the left side of your ne
 
 ![Architecture Overview](/images/connect-switch-namelookup-flow.png)
 
-Now connect the "name lookup" to the "Parse out Itemid". You are just about done. 
+Now connect the "name lookup" to the "Parse out Itemid". You are just about done.
 
 ![Architecture Overview](/images/connect-namelookup-parseid-flow.png)
 
@@ -676,7 +677,7 @@ Okay your final flow should look something like the following:
 Congrats you have completed exercise 2. The completed new service will make it easy for a developer to translate back and forth between item names and numbers.
 
 ## Exercise 3:
-Start a new tab in Node-RED, and paste in the nodes for Exercise 3. 
+Start a new tab in Node-RED, and paste in the nodes for Exercise 3.
 
 In the right corner is a "plus sign". Click it to add a new flow within NodeRed.
 
@@ -1128,18 +1129,18 @@ Copy the code below and paste it into the new flow.
 ]
 ```
 
-Your screen should look something like the following. You might have to move the copied flow around to make it more visible. 
+Your screen should look something like the following. You might have to move the copied flow around to make it more visible.
 
 ![Architecture Overview](/images/exercise-three-start-flow.png)
 
 This is a big one, and makes use of both Weather Channel data, as well as the product information we have made available through our previous two exercises.
 
-The first thing to do is get your weather data http requests working. By default (and with good reason!), 
-Node-RED does not export user credentials when you import/export, so you’ll have to enter in your own credentials here. 
+The first thing to do is get your weather data http requests working. By default (and with good reason!),
+Node-RED does not export user credentials when you import/export, so you’ll have to enter in your own credentials here.
 These are not your w3 credentials, but the username/password specific to the Weather Channel Data service, which you’ll create in the next step.
 
-Go to bluemix.net and head over to Catalog, which will show you the list of services available. 
-Find “Weather Company Data”, under Data & Analytics. Click ont he tile to create the service
+Go to bluemix.net and head over to Catalog, which will show you the list of services available.
+Find “Weather Company Data”, under Data & Analytics. Click on the tile to create the service
 
 ![Architecture Overview](/images/bluemix-weather-tile.png)
 
@@ -1149,11 +1150,11 @@ You should now have your newly created weather service on your BlueMix dashboard
 
 ![Architecture Overview](/images/bluemix-dashboard-weather.png)
 
-On the left-hand side, find “Service Credentials”and then “View Credentials”, which is where you’ll find the username/password. 
+On the left-hand side, find “Service Credentials”and then “View Credentials”, which is where you’ll find the username/password.
 
 ![Architecture Overview](/images/bluemix-weather-credentials.png)
 
-Go back to your newly created "NodeRed flow". There are two "http request" nodes that need to be updated. 
+Go back to your newly created "NodeRed flow". There are two "http request" nodes that need to be updated.
 These nodes are pointing to the weather.com REST API's. They need to have the credentials added, so you can invoke the API's.
 
 ![Architecture Overview](/images/http-request-weather-nodes.png)
@@ -1167,14 +1168,14 @@ Paste your **username** and **password** from your weather BlueMix service.
 
 ![Architecture Overview](/images/http-request-node-detail-basicauth-filled.png)
 
-Enter this same information into the other "http request" node. This second node is used to call the "48 hour" forecast, for a geo location. Remember the geo location came from the prior http request to the weather API. 
+Enter this same information into the other "http request" node. This second node is used to call the "48 hour" forecast, for a geo location. Remember the geo location came from the prior http request to the weather API.
 
 ![Architecture Overview](/images/http-request-node-detail-url-forecast.png)
 
 
-With your credentials entered, you should be able to access a web page by heading to [name].mybluemix.net/weather.
+With your credentials entered, you should be able to access a web page by heading to [name].mybluemix.net/weather. Where [name] is the application name from your NodeRed application. It should be something like STSAWorkshops-xx.
 
-It will return a list of weather-related items. 
+It will return a list of weather-related items.
 
 Note: You'll note that the page returns in a different order each time. This is because calls made after the "Split" node are being made asynchronously and returned as soon as they complete. If order were important, we could write a function to order them.
 
@@ -1190,9 +1191,8 @@ We need to highlight the weather-related items that are below recommended invent
 If you need help finding the values for these comparisons, check the various Function nodes where we moved values out of payload and into other objects. Also, if you're having trouble figuring out the correct keys to use for the store inventory, turn on the CICS debug node for the full output, which should contain some clues.
 
 ## Exercise 5:
-You probably noticed there were a few fields in the key/value store that were not used, such as tags, and location code. There is also a ton of information returned from the Weather Channel Data service that we didn't use for this example. 
+You probably noticed there were a few fields in the key/value store that were not used, such as tags, and location code. There is also a ton of information returned from the Weather Channel Data service that we didn't use for this example.
 
 What are some ways the page, or the individual services, could be improved by taking into consideration this additional data? Or, using the data that we already have, what additional services could we provide to developers who are building their own applications?
 
-What are some situations where you would want to update data as well as read it, and how might you go about implementing that in a Node-RED flow? 
-
+What are some situations where you would want to update data as well as read it, and how might you go about implementing that in a Node-RED flow?
