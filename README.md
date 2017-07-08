@@ -1237,6 +1237,24 @@ We need to highlight the weather-related items that are below recommended invent
 If you need help finding the values for these comparisons, check the various Function nodes where we moved values out of payload and into other objects. Also, if you're having trouble figuring out the correct keys to use for the store inventory, turn on the CICS debug node for the full output, which should contain some clues.
 
 ## Exercise 5:
+Okay now is the time to leverage our skills from the prior workshops. Lets see if you can connect Watson Conversation Service to your newly created flows.
+#### In Watson Conversation
+1. Create a new Intent and call it **Inventory Lookup**. Make sure to create examples of how you think a user will ask about the products.
+2. Create a new Entity and call it **Products**. Add the products from exercise 3 above.
+3. Create a dialog flow that will respond to a request for the inventory amount for a generator. **Remember** to add an "output.action" value in the response dialog node in WCS. Maybe call it "product-inventory-lookup"
+
+#### In NodeRed
+1. Update your NodeRed WCS flow and add a new switch option in the "Conversation Actions" node. This should have a new condition looking to the value of "output.action" from step 3. (product-inventory-lookup)
+2. Connect the output of the "Conversation Action" and the API from exercises 1 and 2 for both "TranslateItem" and then "Inventory Lookup". Remember you need to call both API's. Since you will be getting a product name from WCS, you will need to call the TranslateItem first, and then use the result to call Inventory Lookup.
+3. Based on the response from the Inventory API call, copy the inventory value into your Watson Conversation response. Look at **CurrentTempCelcius** node as an example to mimic.
+
+#### Logical Flow
+The node flow should be something like:
+
+ **Conversation Action** -> **Function to get product name from WCS entity** -> **http request to TranslateItem api** -> **Function to get ItemID** -> **http request to Inventory Lookup API** -> **function to copy inventory value into the wcs output.text** -> **http node**  
+
+
+## Exercise 6:
 You probably noticed there were a few fields in the key/value store that were not used, such as tags, and location code. There is also a ton of information returned from the Weather Channel Data service that we didn't use for this example.
 
 What are some ways the page, or the individual services, could be improved by taking into consideration this additional data? Or, using the data that we already have, what additional services could we provide to developers who are building their own applications?
