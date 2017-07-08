@@ -213,7 +213,7 @@ the green square on the right side.
 
 ![Architecture Overview](/images/inject_debug.png)
 
-  #### Try yourself
+### Try yourself
 
   You can try this yourself by dragging each of the nodes (Inject and Debug) into the flow.
 
@@ -503,9 +503,11 @@ http://[hostname]]/resources/ecs/IBM/demo/[item_name]
 ```
 
 Next, if you double click on the "Set store prefix"
+
 ![Architecture Overview](/images/set-store-prefix-node.png)
 
 You will see that the we set the "msg.store_prefix" attribute of the JSON object to "sample_store"
+
 ![Architecture Overview](/images/set-store-prefix-node-details.png)
 
 We are using  "sample_store" as our store prefix, because data is already populated on zOS for this store prefix.
@@ -525,15 +527,20 @@ http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]
 i.e. http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/poughkeepsieny_8675309
 ```
 The "isNumerical" node is a **switch** node which allows for the flow to change based on the conditions defined in the switch node details.
+
 ![Architecture Overview](/images/isnumerical-node.png)
 
 As you can see in the image below there are two conditions in he "switch node".
+
 ![Architecture Overview](/images/isnumerical-node-details.png)
 
 The first condition evaluated is that a number value between 0 and 9999999 is stored in msg.payload.
-The second condition is the catch all condition, which in our case says, that if the values in msg.payload are not a number we wil pass through.
+The second condition is the catch all condition, which in our case says, that if the values in msg.payload are not a number we will pass the data through.
+
+Click **Done** to close the editor.
 
 Now look at the isNumerical node again, you will see two small gray circles on the right of the node.
+
 ![Architecture Overview](/images/isnumerical-node.png)
 
 Those two circles correspond to the two condition in the node details. The top circle is used for the number matching and the bottom circle is for the catch all.
@@ -582,10 +589,12 @@ Make sure to change the "Return" value from **"a UTF-8 string" to "a parsed JSON
 Close the detail view of the "item Lookup" node.
 
 Create a link between the top circle of the switch "isNumerical" and the left side of the "Item look up".
+
 ![Architecture Overview](/images/connect-switch-item-node.png)
 
 
 Create a connection between the "Item lookup" and "Translate Debug" nodes. This will allow us to see what is returned from invoking the API.
+
 ![Architecture Overview](/images/connect-item-node-debug-node.png)
 
 Click the **Deploy** button at the top of the screen.
@@ -600,6 +609,7 @@ Next, click on the left side of the **Inject** node that has "19645922". This ca
 ![Architecture Overview](/images/inject-itemid-node.png)
 
 You should see something like the following in the debug window on the right side:
+
 ![Architecture Overview](/images/item-lookup-debug-output.png)
 
 Okay, as you can see there is a JSON result coming from the API call.
