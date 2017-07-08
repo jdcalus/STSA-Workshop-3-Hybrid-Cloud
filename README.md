@@ -1,3 +1,4 @@
+![STSA Logo](/images/STSALogo.png)
 # Workshop 3 Hybrid Heterogeneous Cloud
 
 ## Introduction
