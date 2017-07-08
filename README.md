@@ -213,63 +213,90 @@ the green square on the right side.
 
 ![Architecture Overview](/images/inject_debug.png)
 
-You can try this yourself by dragging each of the nodes into the flow.
+  #### Try yourself
 
-Double click on the **Inject** node and replace the values as follows:
-![Architecture Overview](/images/inject-hello.png)
+  You can try this yourself by dragging each of the nodes (Inject and Debug) into the flow.
 
-Double click on the debug node and change the name:
-![Architecture Overview](/images/debug-hello.png)
+  Double click on the **Inject** node and replace the values as follows:
 
-- Now click on the **Deploy** button at the top of the screen. You can now click on the left side of the "Hello World" and you should see the output in the debug panel
-	![Architecture Overview](/images/hello-debug-panel.png)		
+  ![Architecture Overview](/images/inject-hello.png)
 
-The first line is a service, and should already work. You can test it and view the debug output using those Inject and Debug nodes.   
-- Click on the inject button for the "Test Item Lookup"
+  Double click on the debug node and change the name:
 
-![Architecture Overview](/images/inject-test-item-lookup-node.png)
+  ![Architecture Overview](/images/debug-hello.png)
 
-Your output in the debug panel should look like:
+  Now click on the **Deploy** button at the top of the screen.
 
-![Architecture Overview](/images/test-item-lookup-debug.png)
+  You can now click on the left side of the "Hello World" and you should see the output in the debug panel
 
+  ![Architecture Overview](/images/hello-debug-panel.png)		
 
-The flow accepts a GET request, and uses the information in the GET querystring to perform its own GET request to the inventory key/value store, which is running out of CICS. It then simply takes the response and sends it back out to the original requestor. By opening the node for the HTTP call, you can see how the item name is substituted in the url by use of triple curly braces. {{{like.this}}}
+### Test Item Lookup
 
-![Architecture Overview](/images/http_request.png)
+  The first line is a service, and should already work. You can test it and view the debug output using those Inject (Test Item Lookup by name) and Debug (CICS Replies) nodes.   
 
+  Click on the inject button for the "Test Item Lookup"
 
+  ![Architecture Overview](/images/inject-test-item-lookup-node.png)
 
+  Your output in the debug panel should look like:
 
-- Do the same thing for the "Test Store Lookup", by clicking on the **Test Store Lookup** inject node.
+  ![Architecture Overview](/images/test-item-lookup-debug.png)
 
-What you see is probably not what you expect.
+### Looking at our own API's
+  From an API perspective the flow accepts a GET request, and uses the information in the GET querystring to perform its own GET request to the inventory key/value store, which is running out of CICS. It then simply takes the response and sends it back out to the original requestor.
+
+  By opening the node for the HTTP call **(Company Item Lookup node)** , you can see how the item name is substituted in the url by use of triple curly braces, {{{like.this}}}. This is called "Mustache Syntax". :wavy_dash:
+
+  ![Architecture Overview](/images/http_request.png)
+
+{{{payload.name}}} is the main JSON attribute that is used to pass data between nodes. We saw this in the IoT Lab as well as the Watson Conversation lab.
+
+### Test Store Lookup
+
+Do the same thing for the "Test Store Lookup", by clicking on the **Test Store Lookup** inject node.
+
+What you see is probably not what you expected.
+
 ![Architecture Overview](/images/store-lookup-debug.png)
+
 As you can see in the debug panel there is an error "No url specified". This is because the "HTTP Node" is not configured properly.
 
-- Double click on the **Store Lookup** node
+
+Double click on the **Store Lookup** node
+
 ![Architecture Overview](/images/http-store-lookup-node.png)
 
 This intentionally doesn't work so we need to fix it. The "URL" field was left empty.
+
 ![Architecture Overview](/images/http-store-lookup-node-edit.png)
 
 
-The HTTP IN and OUT are correct, but this service performs a slightly different query.
+This is because this service performs a slightly different query.
 
 The company uses this service to check on the status of a particular item in a specific store, and they use the following format:
 
-http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]
+`http://[hostname]]/resources/ecs/IBM/demo/[store prefix]_[item number]`
 
-So, for example, if we wanted to look up the status of an item in the Poughkeepsie, NY store location, we would use the following key:
+So, for example, if we wanted to look up the status of an item in the Poughkeepsie, NY store location, we would use the following format:
 
 `http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/poughkeepsieny_8675309`
 
+This translates to the following url format for NodeRed
 `http://mvs1.centers.ihost.com:50200/resources/ecs/IBM/demo/{{{payload.storeprefix}}}_{{{payload.itemnumber}}}`
 
-![Architecture Overview](/images/http-store-lookup-node-edit-url.png)
+This means that the payload must have two attributes:
+1. storeprefix
+2. itemnumber
 
 
-Your HTTP REST call should look fairly similar to the first one, except that you'll be using the triple-curly-braces to substitute two parameters instead of one. Remember the formatting above.
+![Architecture Overview](/images/http-request-store-lookup-node.png)
+
+If you look at the inject node for the store lookup you will see that the payload is providing the information needed for the http request.
+
+![Architecture Overview](/images/inject-store-lookup-node.png)
+
+So your two HTTP REST calls should look fairly similar to each other, except that you'll be using the triple-curly-braces to substitute two parameters instead of one. Remember the formatting above.
 
 Click the **done** and then the **Deploy** button.
 
@@ -279,6 +306,8 @@ Tip: Don't worry if you see a "No Response Object" warning while testing with th
 
 You can also drive these services from a REST client, by using the addresses noted in the HTTP In nodes.
 
+`http://STSAWorkshops-xx.mybluemix.net/itemlookup`
+`http://STSAWorkshops-xx.mybluemix.net/inventorylookup`
 
 
 ## Exercise 2:
