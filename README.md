@@ -714,7 +714,13 @@ Okay your final flow should look something like the following:
 
 ![Architecture Overview](/images/exercise-two-full-flow.png)
 
+You have created another new API for others to call. So when someone wants to translate from item_number to an item_name and vice versa they cal call your API.
+
+`https://STSAWorkshops-xx.mybluemix.net/translate`
+
 Congrats you have completed exercise 2. The completed new service will make it easy for a developer to translate back and forth between item names and numbers.
+
+
 
 ## Exercise 3:
 Start a new tab in Node-RED, and paste in the nodes for Exercise 3.
